@@ -22,6 +22,7 @@ const {
   format = "image/png",
   zIndex,
   opacity,
+  crs,
 } = defineProps<Props>();
 
 const mapPromise = useMap().injectMap();
@@ -46,6 +47,9 @@ watch(
   }
 );
 
+// @ts-expect-error 28992 is toegevoegd in addRD
+const crsValue = crs ? L.CRS[crs] ?? undefined : undefined;
+
 onMounted(async () => {
   const map = await mapPromise;
   if (!map) return;
@@ -57,6 +61,7 @@ onMounted(async () => {
     format,
     style,
     tilematrixset,
+    crs: crsValue,
   });
 
   if (mapObject.value && wmtsLayer.value) {

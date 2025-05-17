@@ -4,13 +4,15 @@
     v-bind="$attrs"
     v-model:bounds="latLngBounds"
     :use-global-leaflet="true"
-    :options="{ editable: true, ...$attrs.options }"
+    :options="{ editable: true, ...($attrs.options || {}) }"
     @ready="mapLoaded"
   >
     <template v-if="ready">
       <slot :map="mapPromise" />
     </template>
-    <component :is="layerComponent" v-bind="layer" />
+    <template v-for="(layerConfig, index) in layer.layer" :key="index">
+      <component :is="getLayerComponent(layerConfig.type)" v-bind="{ ...layerConfig, 'z-index': index }" />
+    </template>
   </LMap>
 </template>
 <script setup lang="ts">
@@ -60,8 +62,7 @@ const layer = computed(() => {
   return layer;
 });
 
-const layerComponent = computed(() => {
-  const { type } = layer.value;
+function getLayerComponent(type: string) {
   if (type === "tile") {
     return LTileLayer;
   } else if (type === "wms") {
@@ -70,7 +71,7 @@ const layerComponent = computed(() => {
     return LWMTSTileLayer;
   }
   throw new Error(`Invalid layer type ${type}`);
-});
+}
 
 const resizeObserver = new ResizeObserver(() => {
   if (mapObject.value) {
@@ -89,7 +90,6 @@ function mapLoaded(map: Map) {
   resizeObserver.observe(map.getContainer());
 }
 
-// const fitted = ref(false);
 watch(
   [bounds, mapObject],
   () => {
@@ -101,10 +101,7 @@ watch(
           [north, east],
         ];
       }
-      // if (!fitted.value) {
       mapObject.value.fitBounds(bounds.value);
-      // fitted.value = true;
-      // }
     }
   },
   { immediate: true, deep: true }

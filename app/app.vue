@@ -3,6 +3,8 @@ useSeoMeta({
   title: "Fietsersbond Deventer - Projecten",
   description: "Projecten op de kaart",
 });
+
+addRD();
 </script>
 
 <template>

@@ -43,6 +43,8 @@
     "nuxt": "^3.17.3",
     "nuxt-mdi": "2.1.1",
     "postmark": "^4.0.5",
+    "proj4": "^2.16.2",
+    "proj4leaflet": "^1.0.2",
     "quill-image-compress": "^2.0.3",
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^3.0.0",
