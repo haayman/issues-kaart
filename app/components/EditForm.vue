@@ -176,6 +176,21 @@ watch(
   },
   { immediate: true, deep: true }
 );
+
+const eventBus = useMapEventBus().inject();
+if (!eventBus) throw new Error("No eventBus provided yet");
+eventBus.on("geometryUpdated", ({ geometry }) => {
+  if (issue.value) {
+    issue.value.geometry = geometry;
+  }
+});
+onMounted(() => {
+  eventBus.emit("setEditable", { id: issue.value?.id, editable: true });
+});
+onUnmounted(() => {
+  eventBus.off("geometryUpdated");
+  eventBus.emit("setEditable", { id: issue.value?.id, editable: false });
+});
 </script>
 
 <style>

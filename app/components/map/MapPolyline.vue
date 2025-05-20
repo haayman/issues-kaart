@@ -17,6 +17,7 @@ import type { Polyline } from "leaflet";
 import { onUnmounted, watch } from "vue";
 
 const props = defineProps<{
+  id: number;
   latLngs: [number, number][];
   color: string;
   selected?: boolean;
@@ -52,9 +53,26 @@ function updateClass() {
   }
 }
 
+const layer = shallowRef<Polyline | undefined>();
 function onReady(line: Polyline) {
   setupSvgElement(line);
+  layer.value = line;
 }
+
+const { editable } = useEditableLayer(layer, props.id);
+
+const eventBus = useMapEventBus().inject();
+if (!eventBus) throw new Error("No eventBus provided yet");
+onMounted(() => {
+  eventBus.on("toggleEditable", (id: number) => {
+    if (id === props.id) {
+      editable.value = !editable.value;
+    }
+  });
+});
+onUnmounted(() => {
+  eventBus.off("toggleEditable");
+});
 
 watch(() => props.selected, updateClass);
 </script>

@@ -22,6 +22,7 @@ import { LMarker } from "@vue-leaflet/vue-leaflet";
 import type { Marker } from "leaflet";
 
 const props = defineProps<{
+  id: number;
   latLng: [number, number];
   color: string;
   selected?: boolean;
@@ -37,6 +38,27 @@ function setupSvgElement(marker: Marker) {
   updateClass();
 }
 
+const layer = shallowRef<Marker | undefined>();
+function onReady(marker: Marker) {
+  setupSvgElement(marker);
+  layer.value = marker;
+}
+
+const { editableRef } = useEditableLayer(layer, props.id);
+
+const eventBus = useMapEventBus().inject();
+if (!eventBus) throw new Error("No eventBus provided yet");
+onMounted(() => {
+  eventBus.on("setEditable", ({ id, editable }) => {
+    if (id === props.id) {
+      editableRef.value = editable;
+    }
+  });
+});
+onUnmounted(() => {
+  eventBus.off("setEditable");
+});
+
 function updateClass() {
   if (!path) return;
 
@@ -45,10 +67,6 @@ function updateClass() {
   } else {
     path.classList.remove("line-selected");
   }
-}
-
-function onReady(line: Marker) {
-  setupSvgElement(line);
 }
 
 watch(() => props.selected, updateClass);

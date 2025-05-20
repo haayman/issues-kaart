@@ -170,7 +170,6 @@ function removeLayer() {
 
   if (layerRef.value) {
     removeMapHandlers();
-    // @ts-ignore
     map.removeLayer(layerRef.value);
     layerRef.value.off(); // remove all event listeners
     layerRef.value = null;
@@ -194,11 +193,9 @@ function initFeature(editable: boolean) {
   }
 }
 
-// @ts-ignore
 watch(editableFeature.feature, () => {
   if (!map) return;
   // Force stop drawing after geoJSON update, values can be entered via input fields
-  // @ts-ignore
   map.editTools?.stopDrawing();
   // if there's an uneditable feature, remove the editable feature
   if (!editableFeature.editable.value) {
@@ -208,7 +205,7 @@ watch(editableFeature.feature, () => {
   initFeature(editableFeature.editable.value);
 });
 
-function addHandlers(layer: Polygon | Marker) {
+function addHandlers(layer: Polygon | Polyline | Marker) {
   layer.on("editable:vertex:dragend", onChangeFeatureLayer);
   layer.on("editable:vertex:deleted", onChangeFeatureLayer);
   layer.on("editable:enable", () => {

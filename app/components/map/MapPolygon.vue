@@ -16,6 +16,7 @@ import type { Polygon } from "leaflet";
 import { watch } from "vue";
 
 const props = defineProps<{
+  id: number;
   latLngs: [number, number][];
   color: string;
   selected?: boolean;
@@ -52,10 +53,26 @@ function updateClass() {
   }
 }
 
+const layer = shallowRef<Polygon | undefined>();
 function onReady(polygon: Polygon) {
   setupSvgElement(polygon);
+  layer.value = polygon;
 }
 
+const { editableRef } = useEditableLayer(layer, props.id);
+
+const eventBus = useMapEventBus().inject();
+if (!eventBus) throw new Error("No eventBus provided yet");
+onMounted(() => {
+  eventBus.on("setEditable", ({ id, editable }) => {
+    if (id === props.id) {
+      editableRef.value = editable;
+    }
+  });
+});
+onUnmounted(() => {
+  eventBus.off("setEditable");
+});
 watch(() => props.selected, updateClass, { immediate: true });
 </script>
 

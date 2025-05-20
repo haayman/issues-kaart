@@ -2,26 +2,9 @@
   <MapContainer>
     <MapEditableFeatureLayer />
 
-    <MapMarker
-      v-for="issue in markers"
-      :key="`marker-${issue.id}`"
-      :lat-lng="toLatLng(issue)"
-      :color="issue.color"
-      :selected="issue.id == selectedId"
-      @click="navigateToIssue(issue)"
-    >
-      <template #tooltip>
-        <div>
-          <strong>{{ issue.title }}</strong>
-          <div v-if="issue.legend_name" class="text-caption">
-            {{ issue.legend_name }}
-          </div>
-        </div>
-      </template>
-    </MapMarker>
-
     <MapPolygon
       v-for="issue in polygons"
+      :id="issue.id"
       :key="`polygon-${issue.id}`"
       :lat-lngs="toLatLng(issue)"
       :color="issue.color"
@@ -40,6 +23,7 @@
 
     <MapPolyline
       v-for="issue in lines"
+      :id="issue.id"
       :key="`line-${issue.id}`"
       :lat-lngs="toLatLng(issue)"
       :color="issue.color"
@@ -55,6 +39,25 @@
         </div>
       </template>
     </MapPolyline>
+
+    <MapMarker
+      v-for="issue in markers"
+      :id="issue.id"
+      :key="`marker-${issue.id}`"
+      :lat-lng="toLatLng(issue)"
+      :color="issue.color"
+      :selected="issue.id == selectedId"
+      @click="navigateToIssue(issue)"
+    >
+      <template #tooltip>
+        <div>
+          <strong>{{ issue.title }}</strong>
+          <div v-if="issue.legend_name" class="text-caption">
+            {{ issue.legend_name }}
+          </div>
+        </div>
+      </template>
+    </MapMarker>
   </MapContainer>
 </template>
 
