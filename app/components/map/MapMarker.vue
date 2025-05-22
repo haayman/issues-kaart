@@ -38,13 +38,12 @@ function setupSvgElement(marker: Marker) {
   updateClass();
 }
 
-const layer = shallowRef<Marker | undefined>();
+const { editableRef, addEditor } = useEditableLayer(props.id);
+
 function onReady(marker: Marker) {
   setupSvgElement(marker);
-  layer.value = marker;
+  addEditor(marker);
 }
-
-const { editableRef } = useEditableLayer(layer, props.id);
 
 const eventBus = useMapEventBus().inject();
 if (!eventBus) throw new Error("No eventBus provided yet");

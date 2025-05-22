@@ -53,20 +53,19 @@ function updateClass() {
   }
 }
 
-const layer = shallowRef<Polyline | undefined>();
+const { editableRef, addEditor } = useEditableLayer(props.id);
+
 function onReady(line: Polyline) {
   setupSvgElement(line);
-  layer.value = line;
+  addEditor(line);
 }
-
-const { editable } = useEditableLayer(layer, props.id);
 
 const eventBus = useMapEventBus().inject();
 if (!eventBus) throw new Error("No eventBus provided yet");
 onMounted(() => {
   eventBus.on("toggleEditable", (id: number) => {
     if (id === props.id) {
-      editable.value = !editable.value;
+      editableRef.value = !editableRef.value;
     }
   });
 });

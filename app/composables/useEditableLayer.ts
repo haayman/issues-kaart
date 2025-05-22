@@ -1,35 +1,32 @@
 import {
+  type Polygon as LeafletPolygon,
+  type Polyline as LeafletPolyline,
+  type Marker,
   type Map,
-  Polygon as LeafletPolygon,
-  Polyline as LeafletPolyline,
   DomEvent,
-  Marker,
 } from "leaflet";
 import type { Feature, LineString, Point, Polygon } from "geojson";
-import type { ShallowRef } from "vue";
 
-export const useEditableLayer = (
-  layer: ShallowRef<LeafletPolygon | LeafletPolyline | Marker | undefined>,
-  id: number
-) => {
+export const useEditableLayer = (id: number) => {
   const feature: Ref<Feature<Polygon | LineString | Point> | null> = ref(null);
   const editableRef = ref(false);
 
   const mapPromise = useMap().injectMap();
   let map: Map | undefined = undefined;
+
+  let layer: LeafletPolygon | LeafletPolyline | Marker | undefined;
+
   onMounted(async () => {
     map = await mapPromise;
   });
 
   function onChangeFeatureLayer() {
-    feature.value = layer.value?.toGeoJSON() as Feature<
-      Polygon | LineString | Point
-    >;
+    feature.value = layer?.toGeoJSON() as Feature<Polygon | LineString | Point>;
   }
 
   function toggleEdit() {
     editableRef.value = !editableRef.value;
-    layer.value?.toggleEdit();
+    layer?.toggleEdit();
   }
 
   function addHandlers(layer: LeafletPolygon | LeafletPolyline | Marker) {
@@ -52,34 +49,45 @@ export const useEditableLayer = (
     layer.off("dblclick", toggleEdit);
   }
 
-  watch([layer, editableRef], () => {
-    if (!layer.value) return;
-    const rawLayer = toRaw(layer.value);
-    // @ts-ignore
-    if (!rawLayer.editor) {
-      if (rawLayer instanceof Marker) {
-        // @ts-ignore
-        rawLayer.editor = new L.Editable.MarkerEditor(map, rawLayer);
-      } else if (rawLayer instanceof LeafletPolygon) {
-        // @ts-ignore
-        rawLayer.editor = new L.Editable.PolygonEditor(map, rawLayer);
-      } else if (rawLayer instanceof LeafletPolyline) {
-        // @ts-ignore
-        rawLayer.editor = new L.Editable.PolylineEditor(map, rawLayer);
-      }
+  watch(editableRef, () => {
+    if (!layer) {
+      console.warn("Layer not set");
+      return;
     }
-    console.log("set rawLayer editible", id, editableRef.value);
-    if (editableRef.value) {
-      addHandlers(rawLayer);
-      rawLayer.enableEdit();
-    } else {
-      rawLayer.disableEdit();
-      removeHandlers(rawLayer);
+    // @ts-ignore
+    console.log("set layer editible", id, editableRef.value);
+    try {
+      if (editableRef.value) {
+        addHandlers(layer);
+        layer.enableEdit();
+      } else {
+        layer.disableEdit();
+        removeHandlers(layer);
+      }
+    } catch (e) {
+      console.error("Error setting layer editable", e);
     }
   });
+
+  function addEditor(newLayer: LeafletPolygon | LeafletPolyline | Marker) {
+    layer = newLayer;
+    // if (!layer.editor) {
+    //   if (layer instanceof Marker) {
+    //     // @ts-ignore
+    //     layer.editor = new L.Editable.MarkerEditor(map, layer);
+    //   } else if (layer instanceof LeafletPolygon) {
+    //     // @ts-ignore
+    //     layer.editor = new L.Editable.PolygonEditor(map, layer);
+    //   } else if (layer instanceof LeafletPolyline) {
+    //     // @ts-ignore
+    //     layer.editor = new L.Editable.PolylineEditor(map, layer);
+    //   }
+    // }
+  }
 
   return {
     feature,
     editableRef,
+    addEditor,
   };
 };

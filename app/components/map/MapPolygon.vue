@@ -53,13 +53,12 @@ function updateClass() {
   }
 }
 
-const layer = shallowRef<Polygon | undefined>();
+const { editableRef, addEditor } = useEditableLayer(props.id);
+
 function onReady(polygon: Polygon) {
   setupSvgElement(polygon);
-  layer.value = polygon;
+  addEditor(polygon);
 }
-
-const { editableRef } = useEditableLayer(layer, props.id);
 
 const eventBus = useMapEventBus().inject();
 if (!eventBus) throw new Error("No eventBus provided yet");
