@@ -88,7 +88,6 @@ if (!id) {
 } else if (id === "new") {
   isEditing.value = true;
   issue.value = {
-    id: "",
     title: "",
     description: "",
     legend_id: null,
@@ -99,7 +98,7 @@ if (!id) {
   };
 } else {
   // Fetch existing item
-  const data = await get(id as string);
+  const data = await get(id);
   if (!data) {
     issue.value = null;
     // Handle issue not found
