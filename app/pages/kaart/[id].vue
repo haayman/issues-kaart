@@ -3,6 +3,12 @@
     <v-toolbar v-if="status === 'authenticated'">
       <Toolbar>
         <v-btn
+          v-if="mobile"
+          icon="mdi-arrow-left"
+          variant="text"
+          @click="close"
+        />
+        <v-btn
           v-if="status === 'authenticated'"
           :icon="!isEditing ? 'mdi-pencil' : 'mdi-pencil-remove'"
           variant="text"
@@ -67,6 +73,7 @@
 
 <script setup lang="ts">
 import type { Issue } from "~/types/Issue";
+const { mobile } = useDisplay();
 
 const route = useRoute();
 const { id } = route.params;
@@ -78,6 +85,7 @@ const { get } = useIssueApi();
 const issue = ref<Issue | null>(null);
 
 const reactiveFeature = useEditableFeature().inject();
+const { close } = useNavigationDrawer();
 
 if (!id) {
   // Redirect to new item creation

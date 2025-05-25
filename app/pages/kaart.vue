@@ -7,7 +7,7 @@
         </v-sheet>
       </v-container>
     </v-main>
-    <v-navigation-drawer location="right" width="400" app class="d-flex">
+    <v-navigation-drawer v-model="isOpen" location="right" app class="d-flex">
       <div class="navigation-content">
         <div class="main-content">
           <NuxtPage />
@@ -26,6 +26,16 @@ definePageMeta({
 });
 
 useMapEventBus().provide();
+
+const { selectedIssueId } = useSelectedIssue();
+const { isOpen } = useNavigationDrawer();
+
+// Open drawer when an issue is selected
+watch(selectedIssueId, (id) => {
+  if (id !== undefined) {
+    isOpen.value = true;
+  }
+});
 
 const reactiveFeature = new ReactiveFeature();
 useEditableFeature().provide(reactiveFeature);
