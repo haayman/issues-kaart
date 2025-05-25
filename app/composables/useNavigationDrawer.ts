@@ -2,13 +2,13 @@ import type { Ref } from "vue";
 
 export function useNavigationDrawer() {
   const isOpen = useState<boolean>("navigation-drawer-open", () => false);
-  const { smAndUp } = useDisplay();
+  const { mobile } = useDisplay();
 
   // On desktop, drawer is always open
   watch(
-    smAndUp,
-    (isDesktop) => {
-      if (isDesktop) {
+    mobile,
+    (mobile) => {
+      if (!mobile) {
         isOpen.value = true;
       }
     },
@@ -20,16 +20,12 @@ export function useNavigationDrawer() {
   }
 
   function close() {
-    if (!smAndUp.value) {
+    if (mobile.value) {
       isOpen.value = false;
     }
   }
 
-  watch(
-    isOpen,
-    () => console.log("Navigation drawer state changed:", isOpen.value),
-    { immediate: true }
-  );
+  watch(isOpen, () => console.log("isOpen", isOpen.value), { immediate: true });
 
   function toggle() {
     isOpen.value = !isOpen.value;
