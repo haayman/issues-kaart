@@ -1,8 +1,8 @@
 <template>
   <MapLayout>
     <template #content>
-      <template v-if="route.name === 'kaart'">
-        <WelcomePanel title="Welkom bij de Fietsersbond Deventer" />
+      <template v-if="route.name === 'iframe'">
+        <WelcomePanel title="Fietsersbond Deventer" />
       </template>
       <NuxtPage />
     </template>
@@ -12,7 +12,9 @@
 <script setup lang="ts">
 definePageMeta({
   title: "Kaart",
+  layout: "empty",
 });
+
 const route = useRoute();
 useMapEventBus().provide();
 </script>
